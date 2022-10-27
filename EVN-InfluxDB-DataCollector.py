@@ -6,10 +6,13 @@ from datetime import datetime
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
+#URL to the JSON-Data-Source
+DATA_SOURCE = 'http://127.0.0.1:5000/metrics'
+
 #URL to the Influx-Instance
 INFLUX_URL    = 'http://localhost:8086'
 # !!! You must generate an API token from the "API Tokens Tab" in the UI !!!    
-INFLUX_TOKEN  = ''
+INFLUX_TOKEN  = '6rYhX7Gn9-Pk1fmDqHO-8mD__XHK8FDJP9G1J7qegsgJ5hAJhG-1OFr7qR8uQkfwUYPeZ82TU788XeNACI01LQ=='
 # Name of the Influx-Organization
 INFLUX_ORG    = 'MyOrg'
 #Name of the Influx-Bucket to write to
@@ -131,7 +134,7 @@ def write_to_influx(data):
 def main():
     print("Starting the collection of Data")
     while True:
-        jsonData = get_data_from_api('http://localhost:5000/metrics')
+        jsonData = get_data_from_api(DATA_SOURCE)
         data = format_json_data(jsonData)
         write_to_influx(data)
         time.sleep(TIMEOUT)
