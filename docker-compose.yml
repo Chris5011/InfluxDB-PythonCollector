@@ -6,13 +6,21 @@ services:
     ports:
       - '8086:8086'
     volumes:
-      - influxdb-storage:/var/lib/influxdb
+      - type: bind
+        source: ${DataMountPoint}
+        target: /var/lib/influxdb2
+      - type: bind
+        source: ${ConfMountPoint}
+        target: /etc/influxdb2/
+      - type: bind
+        source: /etc/smartmeter/
+        target: /marker
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=admin
-      - DOCKER_INFLUXDB_INIT_PASSWORD=Admin1234!
+      - DOCKER_INFLUXDB_INIT_USERNAME=${USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${PASSWD}
       - DOCKER_INFLUXDB_INIT_ORG=MyOrg
       - DOCKER_INFLUXDB_INIT_BUCKET=Stromzähler
-
-volumes:
-    influxdb-storage:
+    command: /bin/bash -c "/entrypoint.sh"
+    command: /bin/bash -c "exec touch /marker/started"
+    command: /bin/bash -c "tail -f /dev/null" #Keep Container running forever...
