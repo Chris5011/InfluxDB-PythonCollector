@@ -5,12 +5,29 @@
 
 debug=1
 
-if [ ! -d /etc/smartmeter ] ; then 
-	sudo mkdir /etc/smartmeter
+smartmeterConfDir="/etc/smartmeter/"
+influxConfFile="/mnt/InfluxData/conf/influx-configs"
+influxDataStore="/mnt/InfluxData/DataStore/"
+
+breakMaxTimeout=60
+breakTimerCount=0
+
+# Amount of InfluxDB instances detected on the host-system
+influxInstanceCount=$(ps -ef | grep influxd | wc -l)
+
+
+if [ ! $EUID -eq 0 ] ; then
+	echo "Please execute this script with sudo!"
+	exit 1
 fi
 
-if [ ! -f /etc/smartmeter/.didrun ] ; then 
-	sudo touch /etc/smartmeter/.didrun
+
+if [ ! -d $smartmeterConfDir ] ; then 
+	sudo mkdir $smartmeterConfDir
+fi
+
+if [ ! -f "$smartmeterConfDir.didrun" ] ; then 
+	sudo touch "$smartmeterConfDir.didrun"
 else
 	echo "This script was already executed!"
 	echo "If you just want to start the container use: docker-compose run influxdb"	
@@ -24,42 +41,39 @@ docker-compose up > /dev/null 2>&1 &
 if [ ! $? -eq 0 ] ; then
 	echo "Problem during startup of initial container!";
 	echo "Please check the Values in the .env-file!";
-	sudo rm /etc/smartmeter/.didrun
-	exit 1;
+	sudo rm "$smartmeterConfDir.didrun"
+	exit 2;
 fi
-
-#echo "Waiting 20 Seconds until the Container has started!"
-#sleep 20
 
 echo "Waiting until the Docker has started..."
 while :
 do
-	
-	if [ -f /etc/smartmeter/started ] ; then
-		echo "container has started!"
+	sleep 2
+	if [ $(ps -ef | grep influxd | wc -l) -gt $influxInstanceCount ] ; then
+		echo "Container has started!"
 		break
+	elif [ $breakTimerCount -ge $breakMaxTimeout ] ; then
+		echo "Could not start the Container. It should not take longer than this."
+		echo "If this Problem persists ensure that you have an internet-connection and change the breakMaxTimeout to a larger number and try again"
+		exit 3
 	fi
+
+	breakTimerCount=$((breakTimerCount + 1))
 done
 
+TOKEN='EMPTY'
+if [ -f $influxConfFile ] ; then
 
+	TOKEN=$(cat /mnt/InfluxData/conf/influx-configs | grep -2 "\[default\]" | grep token | sed -e 's/token =//g' -e 's/\"//g' | tr -d '[:space:]')
 
-
-
-
-#Obtaining a Token from the Docker-File
-COMPOSE=`docker-compose exec influxdb /bin/bash -c "influx auth create --all-access | grep admin"`
-if [[ `echo "$COMPOSE" | wc -l` -ne 1 ]]
-then
-	echo "Failed to obtain token, try to run this script again"
-	echo "Compose debug: $COMPOSE"
-	exit 2;
 else
-	TOKEN=`echo "$COMPOSE" | grep 'admin' | awk '{ print $2; }'`
-	echo "Obtained Token: $TOKEN"
+	echo "Could not find the Config-File in: $influxConfFile!"
+	echo "Terminating!"
+	exit 4
 fi
 
-
-#Priming the Python-Script with the Token
+echo "Obtained Token: $TOKEN"
+echo "Pasting into the EVN-InfluxDB-DataCollector.py ..."
 sed -i "s/INFLUXTOKENPLACEHOLDER/$TOKEN/g" EVN-InfluxDB-DataCollector.py
 
 if [ $debug -ge 1 ] ; then 
