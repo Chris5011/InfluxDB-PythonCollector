@@ -22,6 +22,14 @@ if [ ! $EUID -eq 0 ] ; then
 fi
 
 
+pip3 install -r requirements.txt
+
+if [ $? -ne 0 ] ; then
+	echo "Could not load the Python-Requirements."
+	echo "Try installing them yourself! (requirements.txt)"
+	exit 1
+fi
+
 if [ ! -d $smartmeterConfDir ] ; then 
 	sudo mkdir $smartmeterConfDir
 fi
@@ -78,8 +86,8 @@ sed -i "s/INFLUXTOKENPLACEHOLDER/$TOKEN/g" EVN-InfluxDB-DataCollector.py
 
 if [ $debug -ge 1 ] ; then 
 	#Start the Demo-API
-	python ./demoApi.py > /dev/null 2>&1 &
-	python ./EVN-InfluxDB-DataCollector.py > /dev/null 2>&1 &
+	python demoAPI.py > /dev/null 2>&1 &
+	python EVN-InfluxDB-DataCollector.py & #> /dev/null 2>&1 &
 fi
 
 
