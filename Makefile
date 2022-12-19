@@ -9,7 +9,7 @@ install-debs:
 	sudo apt-get install python3 docker docker-compose -y
 	pip3 install Flask==2.2.2 influxdb_client==1.33.0 requests==2.27.1
 
-install:
+install: install-debs
 	echo "starting the installation of the Smartmeter-DataCollector"
 	#Create Program-Directory
 	sudo mkdir ${SmartmeterDir}
