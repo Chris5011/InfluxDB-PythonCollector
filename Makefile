@@ -37,5 +37,5 @@ clean:
 	sudo systemctl disable Smartmeter.service
 	sudo rm /etc/systemd/system/Smartmeter.service
 	sudo rm -r ${SmartmeterDir}
-
+	sudo rm /etc/smartmeter/.didrun
 
