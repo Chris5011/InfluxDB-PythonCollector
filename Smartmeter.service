@@ -1,0 +1,13 @@
+[Unit]
+Description=Service for the Smartmeter Data-Collector
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=<INSTALLPATH>/startContainer.sh
+ExecStop=<INSTALLPATH>/stopContainer.sh
+
+[Install]
+WantedBy=multi-user.target

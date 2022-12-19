@@ -17,7 +17,6 @@ install: install-debs
 	sudo cp ./EVN-InfluxDB-DataCollector.py ${SmartmeterDir}
 	sudo cp ./docker-compose.yml ${SmartmeterDir}
 	sudo cp ./initialize.sh ${SmartmeterDir}
-	sudo cp ./requirements.txt ${SmartmeterDir}
 	sudo cp ./.env ${SmartmeterDir}
 	sudo cp ./Makefile ${SmartmeterDir}
 	#Copy and Configure the Service
