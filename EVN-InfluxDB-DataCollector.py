@@ -12,7 +12,7 @@ DATA_SOURCE = 'http://127.0.0.1:5000/metrics'
 #URL to the Influx-Instance
 INFLUX_URL    = 'http://localhost:8086'
 # !!! You must generate an API token from the "API Tokens Tab" in the UI !!!    
-INFLUX_TOKEN  = 'G6advMdLI6Kjsv6t7i8MUb0pqOGdVt42Cld-V84qPl-GegmB1FZhRTGONdFI99NlxbEvAcqvBLYyvy2LgUs4xA=='
+INFLUX_TOKEN  = '1F-8QrZwN6ir5ebThOWm-C-QopRzlkPMSe2RYS2kVpLMBalA8c9FFC8olosik2tL0gV0eP1NjW_ylgU2rDW3zw=='
 # Name of the Influx-Organization
 INFLUX_ORG    = 'MyOrg'
 #Name of the Influx-Bucket to write to

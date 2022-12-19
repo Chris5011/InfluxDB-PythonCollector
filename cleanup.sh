@@ -4,7 +4,7 @@
 #Desc: 	This is a development-script for me which cleans the /etc/smartmeter dir
 #	and also deletes the docker-compose instance as well as the images for a fresh start.
 
-rmImage=-1
+rmImage=2
 
 if [ $EUID -ne 0 ] ; then
 	echo "Please execute this script with sudo!"
@@ -27,7 +27,7 @@ done
 
 
 
-docker container rm $(docker container ls -q) > /dev/null 2>&1
+docker container rm $(docker container ls -aq) > /dev/null 2>&1
 
 if [ $rmImage -ge 1 ] ; then	
 	docker volume rm $(docker volume ls -q) > /dev/null 2>&1
