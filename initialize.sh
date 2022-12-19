@@ -10,8 +10,9 @@ influxDataStore=""
 influxConfDir=""
 influxConfFile="/influx-configs"
 
+installPath="<INSTALLPATH>"
 
-breakMaxTimeout=120
+breakMaxTimeout=180
 breakTimerCount=0
 
 # Amount of InfluxDB instances detected on the host-system
@@ -57,8 +58,9 @@ if [ ! $EUID -eq 0 ] ; then
 	exit 1
 fi
 
+echo "Path: $installPath" 
 
-pip3 install -r requirements.txt > /dev/null 2>&1 
+pip3 install -r $installPath/requirements.txt > /dev/null 2>&1 
 
 if [ $? -ne 0 ] ; then
 	echo "Could not load the Python-Requirements."
@@ -78,7 +80,7 @@ do
 			influxConfDir=$(echo "$line" | sed 's/ConfMountPoint=//g')
 			;;
 	esac
-done < .env
+done < $installPath/.env
 
 
 echo "Found data directory path: $influxDataStore"
@@ -103,7 +105,7 @@ fi
 
 echo "Starting up..."
 
-docker-compose up > /dev/null 2>&1 &
+cd $installPath ; docker-compose up & #> /dev/null 2>&1 &
 
 if [ ! $? -eq 0 ] ; then
 	echo "Problem during startup of initial container!";

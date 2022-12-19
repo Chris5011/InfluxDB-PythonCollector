@@ -7,5 +7,4 @@ if [ $(docker-compose ps | grep influxdb | grep Exit | wc -l) -eq 1 ] ; then
 	echo "The container is not running!"
 	exit 1 
 fi
-
-docker-compose stop influxdb
+docker-compose stop

@@ -3,9 +3,10 @@
 #Author: Christoph (Chris5011) Dorner
 #Desc: This script is used to start the InfluxDB Container on system-startup
 
-if [ $(docker-compose ps | grep influxdb | grep Up | wc -l) -eq 1 ] ; then
+docker-compose ps
+
+if [ $(docker-compose ps | grep influxdb | grep Up | wc -l) -gt 1 ] ; then
 	echo "The container is already running!"
 	exit 1 
 fi
-
-docker-compose start influxdb
+docker-compose start | tee -a /var/log/Smartmeter.log
