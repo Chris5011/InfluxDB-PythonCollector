@@ -58,15 +58,6 @@ if [ ! $EUID -eq 0 ] ; then
 	exit 1
 fi
 
-echo "Path: $installPath" 
-
-pip3 install -r $installPath/requirements.txt > /dev/null 2>&1 
-
-if [ $? -ne 0 ] ; then
-	echo "Could not load the Python-Requirements."
-	echo "Try installing them yourself! (requirements.txt)"
-	exit 1
-fi
 
 # Obtain the Data and Config-Path from the .env-File
 while read -r line
