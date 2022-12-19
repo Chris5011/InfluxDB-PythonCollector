@@ -6,6 +6,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=oneshot
 RemainAfterExit=true
+WorkingDirectory=<INSTALLPATH>
 ExecStart=<INSTALLPATH>/startContainer.sh
 ExecStop=<INSTALLPATH>/stopContainer.sh
 

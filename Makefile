@@ -9,7 +9,7 @@ install-debs:
 	sudo apt-get install python3 docker docker-compose -y
 	pip3 install Flask==2.2.2 influxdb_client==1.33.0 requests==2.27.1
 
-install: install-debs
+install: # install-debs
 	echo "starting the installation of the Smartmeter-DataCollector"
 	#Create Program-Directory
 	sudo mkdir ${SmartmeterDir}
@@ -31,12 +31,11 @@ install: install-debs
 	sudo ${SmartmeterDir}/initialize.sh
 	echo "Finished installing - the container can now be started using sudo systemctl start Smartmeter"
 
-run: 
-	sudo systemctl start Smartmeter
-
 clean: 
-	echo "Cleaning up everything"
-	sudo ${SmartmeterDir}/cleanup.sh || echo ""
-	sudo ./cleanup.sh
+	cd ${SmartmeterDir} ; docker-compose down
+	sudo systemctl stop Smartmeter.service
+	sudo systemctl disable Smartmeter.service
+	sudo rm /etc/systemd/system/Smartmeter.service
+	sudo rm -r ${SmartmeterDir}
 
 
