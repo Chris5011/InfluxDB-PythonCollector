@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import sys
 from requests import RequestException
 from datetime import datetime
 from influxdb_client import InfluxDBClient, Point, WritePrecision
@@ -37,11 +38,11 @@ def get_data_from_api(url='localhost:5000/metrics'):
             #print("Data: {0}".format(r.json()))
             return r.json()
         else:
-            print("Request failed (Status-Code: {0})".format(r.status_code))
+            print(f'Request failed (Status-Code: {r.status_code})', file=sys.stderr)
             pass
             #exit(2)
     except RequestException:
-        print("Request failed with an exception!")
+        print('Request failed with an exception!', file=sys.stderr)
         pass 
         #exit(1)
 
@@ -103,18 +104,6 @@ def format_json_data(jsonData = '{}'):
     
     return formattedJSON
     
-
-def write_to_influx_dummy(data):
-
-        point = Point("Stromzähler")
-        for field in data:
-            if field != 'timestamp':
-                point = point.field(field, data[field])
-            else: 
-                point = point.time(datetime.strptime(data[field], TIME_FORMAT), WritePrecision.NS)
-
-        print(point)
-
 def write_to_influx(data):
 
     try:
@@ -131,24 +120,25 @@ def write_to_influx(data):
                 else: 
                     point = point.field(field, float(data[field]))
             
-            write_api.write(INFLUX_BUCKET, INFLUX_ORG, point)
+                write_api.write(INFLUX_BUCKET, INFLUX_ORG, point)
             client.close()
     except:
-        print('There was an error writing to the InfluxDB!')
+        print('There was an error writing to the InfluxDB!', file=sys.stderr)
         pass
 
 def main():
-    print("Starting the collection of Data")
+    print("Starting the collection of Data", file=sys.stderr)
     
     # Endlessly loop here until CTRL-C is pressed: 
     try: 
         while True:
             jsonData = get_data_from_api(DATA_SOURCE)
+            print(jsonData, file=sys.stderr)
             if jsonData != None:
                 data = format_json_data(jsonData)
                 write_to_influx(data)
             else:
-                print('Could not fetch the data from the API')
+                print('Could not fetch the data from the API', file=sys.stderr)
             time.sleep(TIMEOUT)
 
     except KeyboardInterrupt:
