@@ -1,0 +1,13 @@
+[Unit]
+Description=Service to launch the Smartmeter-DataCollector 
+After=Smartmeter.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=<INSTALLPATH>
+ExecStart=<INSTALLPATH>/startCollector.sh
+ExecStop=<INSTALLPATH>/stopCollector.sh
+
+[Install]
+WantedBy=multi-user.target

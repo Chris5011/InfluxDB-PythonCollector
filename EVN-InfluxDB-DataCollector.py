@@ -38,10 +38,13 @@ def get_data_from_api(url='localhost:5000/metrics'):
             return r.json()
         else:
             print("Request failed (Status-Code: {0})".format(r.status_code))
-            exit(2)
+            pass
+            #exit(2)
     except RequestException:
         print("Request failed with an exception!")
-        exit(1)
+        pass 
+        #exit(1)
+
 
 
 
@@ -114,31 +117,42 @@ def write_to_influx_dummy(data):
 
 def write_to_influx(data):
 
-    with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) as client:
-        write_api = client.write_api(write_options=SYNCHRONOUS)
+    try:
+        with InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG) as client:
+            write_api = client.write_api(write_options=SYNCHRONOUS)
         
-        for field in data:
-            point = Point("Stromzähler")
-
-            if field == 'timestamp':
-                point = point.time(datetime.strptime(data[field], TIME_FORMAT), WritePrecision.NS)
-            elif field == 'uptime':
-                point = point.field(field, data[field])
-            else: 
-                point = point.field(field, float(data[field]))
+            for field in data:
+                point = Point("Stromzähler")
+    
+                if field == 'timestamp':
+                    point = point.time(datetime.strptime(data[field], TIME_FORMAT), WritePrecision.NS)
+                elif field == 'uptime':
+                    point = point.field(field, data[field])
+                else: 
+                    point = point.field(field, float(data[field]))
             
             write_api.write(INFLUX_BUCKET, INFLUX_ORG, point)
-        client.close()
-
+            client.close()
+    except:
+        print('There was an error writing to the InfluxDB!')
+        pass
 
 def main():
     print("Starting the collection of Data")
-    while True:
-        jsonData = get_data_from_api(DATA_SOURCE)
-        data = format_json_data(jsonData)
-        write_to_influx(data)
-        time.sleep(TIMEOUT)
+    
+    # Endlessly loop here until CTRL-C is pressed: 
+    try: 
+        while True:
+            jsonData = get_data_from_api(DATA_SOURCE)
+            if jsonData != None:
+                data = format_json_data(jsonData)
+                write_to_influx(data)
+            else:
+                print('Could not fetch the data from the API')
+            time.sleep(TIMEOUT)
 
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == '__main__':
 	main()
