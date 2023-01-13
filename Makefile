@@ -37,21 +37,22 @@ install: install-debs
 	sudo sed -i 's#<INSTALLPATH>#${INSTALL_PATH}#g' ${INSTALL_PATH}/stopCollector.sh
 	sudo cp ${INSTALL_PATH}/Smartmeter-Collector.service /etc/systemd/system/Smartmeter-Collector.service
 	sudo systemctl enable Smartmeter-Collector.service
+	@echo "IF THE NEXT STEP RESULTS IN A DOCKER-ERROR: EXECUTE 'sudo make clean', REBOOT THE MACHINE AND EXECUTE 'sudo make install' IN THIS DIRECTORY AGAIN!"
 	#Initialize the Compose-Container
 	sudo sed -i 's#<INSTALLPATH>#${INSTALL_PATH}#g' ${INSTALL_PATH}/initialize.sh	
 	sudo ${INSTALL_PATH}/initialize.sh
 	@echo "Finished installing - the container can now be started using sudo systemctl start Smartmeter"
 
 clean: 
-	cd ${INSTALL_PATH} ; docker-compose down
-	sudo systemctl stop Smartmeter.service
-	sudo systemctl disable Smartmeter.service
-	sudo systemctl stop Smartmeter-Collector.service
-	sudo systemctl disable Smartmeter-Collector.service
-	sudo rm /etc/systemd/system/Smartmeter.service
-	sudo rm /etc/systemd/system/Smartmeter-Collector.service
-	sudo rm -r ${INSTALL_PATH}
-	sudo rm /etc/smartmeter/.didrun
+	-cd ${INSTALL_PATH} ; docker-compose down
+	-sudo systemctl stop Smartmeter.service
+	-sudo systemctl disable Smartmeter.service
+	-sudo systemctl stop Smartmeter-Collector.service
+	-sudo systemctl disable Smartmeter-Collector.service
+	-sudo rm /etc/systemd/system/Smartmeter.service
+	-sudo rm /etc/systemd/system/Smartmeter-Collector.service
+	-sudo rm -r ${INSTALL_PATH}
+	-sudo rm -r /etc/smartmeter
 
 #Does not remove orphans
 purge: clean
